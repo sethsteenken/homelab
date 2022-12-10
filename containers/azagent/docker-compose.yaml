@@ -1,0 +1,48 @@
+version: "3.6"
+services:
+  azdo_agent:
+    cap_drop:
+      - "AUDIT_CONTROL"
+      - "BLOCK_SUSPEND"
+      - "DAC_READ_SEARCH"
+      - "IPC_LOCK"
+      - "IPC_OWNER"
+      - "LEASE"
+      - "LINUX_IMMUTABLE"
+      - "MAC_ADMIN"
+      - "MAC_OVERRIDE"
+      - "NET_ADMIN"
+      - "NET_BROADCAST"
+      - "SYSLOG"
+      - "SYS_ADMIN"
+      - "SYS_BOOT"
+      - "SYS_MODULE"
+      - "SYS_NICE"
+      - "SYS_PACCT"
+      - "SYS_PTRACE"
+      - "SYS_RAWIO"
+      - "SYS_RESOURCE"
+      - "SYS_TIME"
+      - "SYS_TTY_CONFIG"
+      - "WAKE_ALARM"
+    container_name: "azdo_agent"
+    environment:
+      - "AZP_AGENT_NAME=${AZP_AGENT_NAME}"
+      - "AZP_TOKEN=${AZP_TOKEN}"
+      - "AZP_URL=${AZP_URL}"
+      - "AZP_POOL=${AZP_POOL}"
+      - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      - "TARGETARCH=linux-x64"
+    image: "${DOCKER_IMAGE_REGISTRY}/${IMAGE_NAME}:${TAG}"
+    ipc: "private"
+    network_mode: "bridge"
+    restart: "always"
+    working_dir: "/azp"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    healthcheck:
+      test: ["CMD", "/azp/bin/Agent.Listener" ,"--no-verbose", "--tries=1", "--spider", "http://localhost:8080/about"]
+      interval: 1m
+      timeout: 3s
+    depends_on:
+      - image_registry
