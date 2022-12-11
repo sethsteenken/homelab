@@ -1,6 +1,6 @@
 version: "3.6"
 services:
-  azdo_agent:
+  image_registry:
     cap_drop:
       - "AUDIT_CONTROL"
       - "BLOCK_SUSPEND"
@@ -25,24 +25,25 @@ services:
       - "SYS_TIME"
       - "SYS_TTY_CONFIG"
       - "WAKE_ALARM"
-    container_name: "azdo_agent"
+    command:
+      - "/etc/docker/registry/config.yml"
+    container_name: "image_registry"
+    entrypoint:
+      - "/entrypoint.sh"
     environment:
-      - "AZP_AGENT_NAME=${AZP_AGENT_NAME}"
-      - "AZP_TOKEN=${AZP_TOKEN}"
-      - "AZP_URL=${AZP_URL}"
-      - "AZP_POOL=${AZP_POOL}"
       - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-      - "TARGETARCH=linux-x64"
-    image: "${DOCKER_IMAGE_REGISTRY}/${IMAGE_NAME}:${TAG}"
+    image: "registry:latest"
     ipc: "private"
     network_mode: "bridge"
+    ports:
+      - "5000:5000/tcp"
     restart: "always"
-    working_dir: "/azp"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "image_registry_data:/var/lib/registry"
     healthcheck:
-      test: ["CMD", "/azp/bin/Agent.Listener" ,"--no-verbose", "--tries=1", "--spider", "http://localhost:8080/about"]
-      interval: 1m
-      timeout: 3s
-    depends_on:
-      - image_registry
+      test: "wget ${REGISTRY_URL} --spider || exit 1"
+      interval: 2m
+      timeout: 10s
+volumes:
+  image_registry_data:
+    external: true
