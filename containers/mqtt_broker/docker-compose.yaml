@@ -50,7 +50,7 @@ services:
       - "mqtt_broker_data:/mosquitto/data"
       - "mqtt_broker_log:/mosquitto/log"
     healthcheck:
-      test: "timeout 3 mosquitto_sub -h localhost -p 1883 -t 'topic' -E -i probe"
+      test: "timeout 3 mosquitto_sub -h localhost -p 1883 -u ${HEALTHCHECK_PROBE_USER} -P ${HEALTHCHECK_PROBE_PASSWORD} -t 'topic' -E -i probe"
       interval: 30s
       timeout: 5s
 volumes:
