@@ -26,6 +26,8 @@ services:
       - "SYS_TTY_CONFIG"
       - "WAKE_ALARM"
     container_name: "azdo_agent"
+    labels:
+      - docker-volume-backup.stop-during-backup=true
     environment:
       - "AZP_AGENT_NAME=${AZP_AGENT_NAME}"
       - "AZP_TOKEN=${AZP_TOKEN}"

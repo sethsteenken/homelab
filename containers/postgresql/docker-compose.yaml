@@ -39,6 +39,8 @@ services:
       - "PG_MAJOR=15"
       - "PG_VERSION=15.1-1.pgdg110+1"
       - "PGDATA=/var/lib/postgresql/data"
+    labels:
+      - docker-volume-backup.stop-during-backup=true
     image: "postgres:latest"
     ipc: "private"
     network_mode: "bridge"

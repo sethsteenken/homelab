@@ -1,0 +1,51 @@
+version: "3.6"
+services:
+  volumes_backup:
+    cap_drop:
+      - "AUDIT_CONTROL"
+      - "BLOCK_SUSPEND"
+      - "DAC_READ_SEARCH"
+      - "IPC_LOCK"
+      - "IPC_OWNER"
+      - "LEASE"
+      - "LINUX_IMMUTABLE"
+      - "MAC_ADMIN"
+      - "MAC_OVERRIDE"
+      - "NET_ADMIN"
+      - "NET_BROADCAST"
+      - "SYSLOG"
+      - "SYS_ADMIN"
+      - "SYS_BOOT"
+      - "SYS_MODULE"
+      - "SYS_NICE"
+      - "SYS_PACCT"
+      - "SYS_PTRACE"
+      - "SYS_RAWIO"
+      - "SYS_RESOURCE"
+      - "SYS_TIME"
+      - "SYS_TTY_CONFIG"
+      - "WAKE_ALARM"
+    container_name: "volumes_backup"
+    image: offen/docker-volume-backup:latest
+    environment:
+      BACKUP_FILENAME: backup-%Y-%m-%dT%H-%M-%S.tar.gz
+      BACKUP_PRUNING_PREFIX: backup-
+      BACKUP_RETENTION_DAYS: 5
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - nas_backups_container_volumes:/archive
+      - mqtt_broker_log:/backup/mqtt_broker_log:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: always
+    healthcheck:
+      test: "exit 0"
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+volumes:
+  nas_backups_container_volumes:
+    external: true
+  mqtt_broker_log:
+    external: true

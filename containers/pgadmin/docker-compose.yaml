@@ -33,6 +33,8 @@ services:
       - "PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}"
       - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
       - "PYTHONPATH=/pgadmin4"
+    labels:
+      - docker-volume-backup.stop-during-backup=true
     image: "dpage/pgadmin4:latest"
     ipc: "private"
     network_mode: "bridge"
