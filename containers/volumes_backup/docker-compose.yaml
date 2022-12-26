@@ -31,11 +31,24 @@ services:
       BACKUP_FILENAME: backup-%Y-%m-%dT%H-%M-%S.tar.gz
       BACKUP_PRUNING_PREFIX: backup-
       BACKUP_RETENTION_DAYS: 5
+      SSH_HOST_NAME: ${SSH_HOST}
+      SSH_PORT: 22
+      SSH_USER: ${SSH_USER}
+      SSH_PASSWORD: ${SSH_PASSWORD}
+      SSH_REMOTE_PATH: ${SSH_PATH}
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - nas_backups_container_volumes:/archive
+      - file_browser_data:/backup/file_browser_data:ro
+      - home_assistant_data:/backup/home_assistant_data:ro
+      - keg_monitor_app_data:/backup/keg_monitor_app_data:ro
+      - mqtt_broker_config:/backup/mqtt_broker_config:ro
+      - mqtt_broker_data:/backup/mqtt_broker_data:ro
       - mqtt_broker_log:/backup/mqtt_broker_log:ro
+      - pgadmin:/backup/pgadmin:ro
+      - plex_server_config:/backup/plex_server_config:ro
+      - portainer_data:/backup/portainer_data:ro
+      - postgresql_data:/backup/postgresql_data:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: always
     healthcheck:
@@ -45,7 +58,23 @@ services:
       retries: 3
       start_period: 10s
 volumes:
-  nas_backups_container_volumes:
+  file_browser_data:
+    external: true
+  home_assistant_data:
+    external: true
+  keg_monitor_app_data:
+    external: true
+  mqtt_broker_config:
+    external: true
+  mqtt_broker_data:
     external: true
   mqtt_broker_log:
+    external: true
+  pgadmin:
+    external: true
+  plex_server_config:
+    external: true
+  portainer_data:
+    external: true
+  postgresql_data:
     external: true
