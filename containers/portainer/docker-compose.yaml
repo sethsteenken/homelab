@@ -54,7 +54,6 @@ services:
       org.opencontainers.image.vendor: "Portainer.io"
     network_mode: "bridge"
     ports:
-      - "8000:8000/tcp"
       - "9443:9443/tcp"
     restart: "always"
     volumes:
