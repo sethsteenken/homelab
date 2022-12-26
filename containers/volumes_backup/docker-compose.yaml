@@ -40,12 +40,11 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
       - file_browser_data:/backup/file_browser_data:ro
-      - home_assistant_data:/backup/home_assistant_data:ro
       - keg_monitor_app_data:/backup/keg_monitor_app_data:ro
       - mqtt_broker_config:/backup/mqtt_broker_config:ro
       - mqtt_broker_data:/backup/mqtt_broker_data:ro
       - mqtt_broker_log:/backup/mqtt_broker_log:ro
-      - pgadmin:/backup/pgadmin:ro
+      - pgadmin_data:/backup/pgadmin:ro
       - plex_server_config:/backup/plex_server_config:ro
       - portainer_data:/backup/portainer_data:ro
       - postgresql_data:/backup/postgresql_data:ro
@@ -60,8 +59,6 @@ services:
 volumes:
   file_browser_data:
     external: true
-  home_assistant_data:
-    external: true
   keg_monitor_app_data:
     external: true
   mqtt_broker_config:
@@ -70,7 +67,7 @@ volumes:
     external: true
   mqtt_broker_log:
     external: true
-  pgadmin:
+  pgadmin_data:
     external: true
   plex_server_config:
     external: true
