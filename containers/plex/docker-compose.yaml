@@ -80,7 +80,7 @@ services:
     restart: "always"
     volumes:
       - "plex_server_config:/config"
-      - "nas_shared_media:${NAS_MOUNT_PATH}"
+      - "nas_media:${NAS_MOUNT_PATH}"
     working_dir: "/"
     healthcheck:
       test: "curl --connect-timeout 15 --max-time 100 --silent --show-error --fail 'http://localhost:32400/identity' >/dev/null"
@@ -89,7 +89,7 @@ services:
       retries: 3 
       start_period: 1m
 volumes:
-  nas_shared_media:
+  nas_media:
     external: true
   plex_server_config:
     external: true

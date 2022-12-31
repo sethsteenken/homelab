@@ -1,6 +1,6 @@
 version: "3.6"
 services:
-  plex:
+  file_browser:
     cap_drop:
       - "AUDIT_CONTROL"
       - "BLOCK_SUSPEND"
@@ -28,13 +28,15 @@ services:
     container_name: "file_browser"
     image: hurlenko/filebrowser
     user: "${UID}:${GID}"
+    network_mode: "bridge"
     ports:
       - ${ACCESS_PORT}:8080/tcp
     volumes:
-      - nas_shared_media:/data/media
-      - nas_shared_documents:/data/documents
-      - nas_backups_databases:/data/backups/databases
-      - nas_backups_container_volumes:/data/backups/volumes
+      - nas_media:/data/media
+      - nas_documents:/data/documents
+      - nas_backups:/data/backups
+      - nas_software:/data/software
+      - /var/lib/docker/volumes:/data/docker/volumes
       - file_browser_data:/config
     environment:
       - FB_BASEURL=/filebrowser
@@ -46,13 +48,13 @@ services:
       retries: 3
       start_period: 10s
 volumes:
-  nas_shared_media:
+  nas_media:
     external: true
-  nas_backups_databases:
+  nas_documents:
     external: true
-  nas_backups_container_volumes:
+  nas_backups:
     external: true
-  nas_shared_documents:
+  nas_software:
     external: true
   file_browser_data:
     external: true

@@ -31,11 +31,14 @@ services:
       BACKUP_FILENAME: backup-%Y-%m-%dT%H-%M-%S.tar.gz
       BACKUP_PRUNING_PREFIX: backup-
       BACKUP_RETENTION_DAYS: 5
+      BACKUP_CRON_EXPRESSION: ${CRON_SCHEDULE}
       SSH_HOST_NAME: ${SSH_HOST}
       SSH_PORT: 22
       SSH_USER: ${SSH_USER}
       SSH_PASSWORD: ${SSH_PASSWORD}
       SSH_REMOTE_PATH: ${SSH_PATH}
+    network_mode: "bridge"
+    #entrypoint: backup
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
