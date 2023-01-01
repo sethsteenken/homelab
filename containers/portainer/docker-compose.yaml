@@ -53,6 +53,9 @@ services:
       org.opencontainers.image.title: "Portainer"
       org.opencontainers.image.vendor: "Portainer.io"
     network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.22
     ports:
       - "9443:9443/tcp"
     restart: "always"
@@ -68,4 +71,7 @@ services:
       start_period: 10s
 volumes:
   portainer_data:
+    external: true
+networks:
+  server_net:
     external: true

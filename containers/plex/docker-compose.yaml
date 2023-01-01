@@ -75,6 +75,9 @@ services:
       org.opencontainers.image.vendor: "linuxserver.io"
       org.opencontainers.image.version: "1.29.2.6364-6d72b0cf6-ls145"
     network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: ${IP_ADDRESS}
     ports:
       - "32400:32400/tcp"
     restart: "always"
@@ -92,4 +95,7 @@ volumes:
   nas_media:
     external: true
   plex_server_config:
+    external: true
+networks:
+  server_net:
     external: true

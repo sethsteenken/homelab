@@ -44,6 +44,9 @@ services:
     image: "postgres:latest"
     ipc: "private"
     network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: ${IP_ADDRESS}
     ports:
       - "5432:5432/tcp"
     restart: "always"
@@ -57,4 +60,7 @@ services:
       start_period: 1m
 volumes:
   postgresql_data:
+    external: true
+networks:
+  server_net:
     external: true

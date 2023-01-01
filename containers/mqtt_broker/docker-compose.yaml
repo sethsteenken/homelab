@@ -44,6 +44,9 @@ services:
     image: "eclipse-mosquitto:latest"
     ipc: "private"
     network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: ${IP_ADDRESS}
     ports:
       - "1883:1883/tcp"
     restart: "always"
@@ -61,4 +64,7 @@ volumes:
   mqtt_broker_data:
     external: true
   mqtt_broker_log:
+    external: true
+networks:
+  server_net:
     external: true

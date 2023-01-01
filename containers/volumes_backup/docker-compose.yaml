@@ -38,6 +38,9 @@ services:
       SSH_PASSWORD: ${SSH_PASSWORD}
       SSH_REMOTE_PATH: ${SSH_PATH}
     network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: ${IP_ADDRESS}
     #entrypoint: backup
     volumes:
       - /etc/timezone:/etc/timezone:ro
@@ -77,4 +80,7 @@ volumes:
   portainer_data:
     external: true
   postgresql_data:
+    external: true
+networks:
+  server_net:
     external: true
