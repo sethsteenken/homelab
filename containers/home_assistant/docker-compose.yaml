@@ -40,25 +40,11 @@ services:
     image: "docker.io/homeassistant/home-assistant:latest"
     ipc: "private"
     labels:
-      io.hass.arch: "amd64"
-      io.hass.base.arch: "amd64"
-      io.hass.base.image: "homeassistant/amd64-base:3.16"
-      io.hass.base.name: "python"
-      io.hass.base.version: "2022.11.0"
-      io.hass.type: "core"
-      io.hass.version: "2022.12.2"
-      org.opencontainers.image.authors: "The Home Assistant Authors"
-      org.opencontainers.image.created: "2022-12-11 20:01:33+00:00"
-      org.opencontainers.image.description: "Open-source home automation platform\
-        \ running on Python 3"
-      org.opencontainers.image.documentation: "https://www.home-assistant.io/docs/"
-      org.opencontainers.image.licenses: "Apache License 2.0"
-      org.opencontainers.image.source: "https://github.com/home-assistant/core"
-      org.opencontainers.image.title: "Home Assistant"
-      org.opencontainers.image.url: "https://www.home-assistant.io/"
-      org.opencontainers.image.version: "2022.12.2"
       docker-volume-backup.stop-during-backup: true
     network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: ${IP_ADDRESS}
     ports:
       - "8123:8123/tcp"
     privileged: true
@@ -76,4 +62,7 @@ services:
       start_period: 30s
 volumes:
   home_assistant_data:
+    external: true
+networks:
+  server_net:
     external: true
