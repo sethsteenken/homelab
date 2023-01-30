@@ -52,28 +52,8 @@ services:
       - "PLEX_MEDIA_SERVER_USER=abc"
       - "PLEX_MEDIA_SERVER_INFO_VENDOR=Docker"
       - "PLEX_MEDIA_SERVER_INFO_DEVICE=Docker Container (LinuxServer.io)"
-    image: "lscr.io/linuxserver/plex:latest"
+    image: "lscr.io/linuxserver/plex:${PLEX_VERSION}"
     ipc: "private"
-    labels:
-      build_version: "Linuxserver.io version:- 1.29.2.6364-6d72b0cf6-ls145 Build-date:-\
-        \ 2022-11-28T22:03:13-06:00"
-      maintainer: "thelamer"
-      org.opencontainers.image.authors: "linuxserver.io"
-      org.opencontainers.image.created: "2022-11-28T22:03:13-06:00"
-      org.opencontainers.image.description: "[Plex](https://plex.tv) organizes video,\
-        \ music and photos from personal media libraries and streams them to smart\
-        \ TVs, streaming boxes and mobile devices. This container is packaged as a\
-        \ standalone Plex Media Server. has always been a top priority. Straightforward\
-        \ design and bulk actions mean getting things done faster."
-      org.opencontainers.image.documentation: "https://docs.linuxserver.io/images/docker-plex"
-      org.opencontainers.image.licenses: "GPL-3.0-only"
-      org.opencontainers.image.ref.name: "7ff02692193fbacbe42b237258e5044261de38e7"
-      org.opencontainers.image.revision: "7ff02692193fbacbe42b237258e5044261de38e7"
-      org.opencontainers.image.source: "https://github.com/linuxserver/docker-plex"
-      org.opencontainers.image.title: "Plex"
-      org.opencontainers.image.url: "https://github.com/linuxserver/docker-plex/packages"
-      org.opencontainers.image.vendor: "linuxserver.io"
-      org.opencontainers.image.version: "1.29.2.6364-6d72b0cf6-ls145"
     network_mode: "bridge"
     networks:
       server_net:
