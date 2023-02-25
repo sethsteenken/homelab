@@ -54,6 +54,11 @@ services:
       - plex_server_config:/backup/plex_server_config:ro
       - portainer_data:/backup/portainer_data:ro
       - postgresql_data:/backup/postgresql_data:ro
+      - home_assistant_data:/backup/home_assistant_data:ro
+      - nginx_proxy_config:/backup/nginx_proxy_config:ro
+      - nginx_proxy_data:/backup/nginx_proxy_data:ro
+      - nginx_proxy_letsencrypt:/backup/nginx_proxy_letsencrypt:ro
+      - vscode_data:/backup/vscode_data:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: always
     healthcheck:
@@ -80,6 +85,16 @@ volumes:
   portainer_data:
     external: true
   postgresql_data:
+    external: true
+  home_assistant_data:
+    external: true
+  nginx_proxy_config:
+    external: true
+  nginx_proxy_data:
+    external: true
+  nginx_proxy_letsencrypt:
+    external: true
+  vscode_data:
     external: true
 networks:
   server_net:

@@ -1,0 +1,60 @@
+version: "3.6"
+services:
+  nginx_proxy:
+    cap_drop:
+      - "AUDIT_CONTROL"
+      - "BLOCK_SUSPEND"
+      - "DAC_READ_SEARCH"
+      - "IPC_LOCK"
+      - "IPC_OWNER"
+      - "LEASE"
+      - "LINUX_IMMUTABLE"
+      - "MAC_ADMIN"
+      - "MAC_OVERRIDE"
+      - "NET_ADMIN"
+      - "NET_BROADCAST"
+      - "SYSLOG"
+      - "SYS_ADMIN"
+      - "SYS_BOOT"
+      - "SYS_MODULE"
+      - "SYS_NICE"
+      - "SYS_PACCT"
+      - "SYS_PTRACE"
+      - "SYS_RAWIO"
+      - "SYS_RESOURCE"
+      - "SYS_TIME"
+      - "SYS_TTY_CONFIG"
+      - "WAKE_ALARM"
+    container_name: "nginx_proxy"
+    environment:
+      - "DB_SQLITE_FILE=/config/database.sqlite"
+      - "DISABLE_IPV6=true"
+    image: "jc21/nginx-proxy-manager:latest"
+    ipc: "private"
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: ${IP_ADDRESS}
+    ports:
+       - '80:80'
+       - '443:443'
+       - '81:81'
+    restart: "always"
+    volumes:
+      - "nginx_proxy_config:/config"
+      - "nginx_proxy_letsencrypt:/etc/letsencrypt"
+      - "nginx_proxy_data:/data"
+    healthcheck:
+      test: ["CMD", "/bin/check-health"]
+      interval: 10s
+      timeout: 3s
+volumes:
+  nginx_proxy_config:
+    external: true
+  nginx_proxy_letsencrypt:
+    external: true
+  nginx_proxy_data:
+    external: true
+networks:
+  server_net:
+    external: true
