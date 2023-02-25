@@ -1,0 +1,33 @@
+version: "3.6"
+services:
+  pi_hole:
+    container_name: pi_hole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "${WEB_PORT}:80/tcp"
+    environment:
+      TZ: '${TIME_ZONE}'
+      WEBPASSWORD: "${WEB_PASSWORD}"
+      FTLCONF_LOCAL_IPV4: '${HOST_IP_ADDRESS}'
+    ipc: "private"
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: ${IP_ADDRESS}
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    volumes:
+      - 'pi_hole_data:/etc/pihole'
+      - 'pi_hole_dnsmasq:/etc/dnsmasq.d'
+    restart: unless-stopped
+volumes:
+  pi_hole_data:
+    external: true
+  pi_hole_dnsmasq:
+    external: true
+networks:
+  server_net:
+    external: true
