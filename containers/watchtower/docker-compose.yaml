@@ -5,10 +5,9 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
+      - $HOME/.docker/config.json:/config.json
     container_name: "watchtower"
     environment:
-      - "REPO_USER=${REPO_USER}"
-      - "REPO_PASS=${REPO_PASS}"
       - "WATCHTOWER_CLEANUP=true"
       - "WATCHTOWER_SCHEDULE=${SCHEDULE}"
       - "WATCHTOWER_DEBUG=${DEBUG}"
