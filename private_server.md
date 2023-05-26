@@ -16,6 +16,16 @@ sudo apt upgrade
 sudo reboot
 ```
 
-### Install Docker
+## Server Prereq Steps
 
+### Install Docker
 [Reference](https://docs.docker.com/engine/install/ubuntu/)
+
+### Set Timezone
+
+```bash
+sudo timedatectl set-timezone America/New_York
+```
+[Reference](https://linuxize.com/post/how-to-set-or-change-timezone-in-linux/)
+
+
