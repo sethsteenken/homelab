@@ -6,6 +6,9 @@ Ubuntu Linux Server VM setup instructions.
 
 TODO
 
+* Download Ubuntu Server 22+ ISO [here](https://ubuntu.com/download/server).
+* Apply to Proxmox
+
 ## Linux Install
 
 Mostly choose defaults. Do NOT install docker.
@@ -19,13 +22,21 @@ sudo reboot
 ## Server Prereq Steps
 
 ### Install Docker
-[Reference](https://docs.docker.com/engine/install/ubuntu/)
+
+Install via the *apt repository method*. Follow steps [here](https://docs.docker.com/engine/install/ubuntu/).
 
 ### Set Timezone
 
 ```bash
 sudo timedatectl set-timezone America/New_York
 ```
+
+Confirm:
+
+```bash
+ls -l /etc/localtime
+```
+
 [Reference](https://linuxize.com/post/how-to-set-or-change-timezone-in-linux/)
 
 
