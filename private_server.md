@@ -36,7 +36,14 @@ Confirm:
 ```bash
 ls -l /etc/localtime
 ```
-
 [Reference](https://linuxize.com/post/how-to-set-or-change-timezone-in-linux/)
 
+### Traceroute to Test VPN
 
+```bash
+sudo apt install traceroute
+```
+
+```bash
+traceroute google.com
+```
