@@ -1,4 +1,4 @@
-# Private Server
+# Main Server
 
 Ubuntu Linux Server VM setup instructions.
 
@@ -7,7 +7,8 @@ Ubuntu Linux Server VM setup instructions.
 TODO
 
 * Download Ubuntu Server 22+ ISO [here](https://ubuntu.com/download/server).
-* Apply to Proxmox
+* Add ISO to Proxmox
+
 
 ## Linux Install
 
@@ -38,12 +39,3 @@ ls -l /etc/localtime
 ```
 [Reference](https://linuxize.com/post/how-to-set-or-change-timezone-in-linux/)
 
-### Traceroute to Test VPN
-
-```bash
-sudo apt install traceroute
-```
-
-```bash
-traceroute google.com
-```

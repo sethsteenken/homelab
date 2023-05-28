@@ -1,0 +1,431 @@
+version: "3.6"
+services:
+  mqtt_broker:
+    container_name: "mqtt_broker"
+    command:
+      - "/usr/sbin/mosquitto"
+      - "-c"
+      - "/mosquitto/config/mosquitto.conf"
+    entrypoint:
+      - "/docker-entrypoint.sh"
+    labels:
+      - docker-volume-backup.stop-during-backup=true
+    image: "eclipse-mosquitto:latest"
+    ipc: "private"
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.2
+    ports:
+      - "1883:1883/tcp"
+    restart: "unless-stopped"
+    volumes:
+      - "mqtt_broker_config:/mosquitto/config"
+      - "mqtt_broker_data:/mosquitto/data"
+      - "mqtt_broker_log:/mosquitto/log"
+    healthcheck:
+      test: "timeout 3 mosquitto_sub -h localhost -p 1883 -u ${MQTT_HEALTH_PROBE_USER} -P ${MQTT_HEALTH_PROBE_PASSWORD} -t 'topic' -E -i probe"
+      interval: 30s
+      timeout: 5s
+  
+  postgresql:
+    container_name: "postgresql"
+    command:
+      - "postgres"
+    entrypoint:
+      - "docker-entrypoint.sh"
+    environment:
+      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+      - "POSTGRES_USER=${POSTGRES_USER}"
+    labels:
+      - docker-volume-backup.stop-during-backup=true
+    image: "postgres:latest"
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.3
+    ports:
+      - "5432:5432/tcp"
+    restart: "unless-stopped"
+    volumes:
+      - "postgresql_data:/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  kegmonitor:
+    container_name: "kegmonitor"
+    image: "thedinklage/kegmonitor:latest"
+    ports:
+      - "7101:80/tcp"
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.4
+    environment:
+      - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      - "ASPNETCORE_ENVIRONMENT=Production"
+      - "ConnectionStrings__DefaultConnection=${KEGMONITOR_CONN_STRING}"
+      - "WebDomain=https://${KEGMONITOR_DOMAIN}"
+      - "MigrateDatabaseToLatest=true"
+      - "Mqtt__ClientId=KM_Web_Sub"
+      - "Mqtt__IpAddress=172.18.0.2"
+      - "Mqtt__Port=1883"
+      - "Mqtt__Username=keg_monitor_web_user"
+      - "Mqtt__Password=${KEGMONITOR_MQTT_PASSWORD}"
+    extra_hosts:
+      - "${KEGMONITOR_DOMAIN}:192.168.1.13"
+    volumes:
+      - "keg_monitor_app_data:/app/wwwroot/uploads"
+    working_dir: "/app"
+    restart: "unless-stopped"
+    healthcheck:
+      test: "curl --fail http://localhost/health || exit 1"
+      interval: 60s
+      retries: 2
+      start_period: 20s
+
+  pgadmin:
+    container_name: "pgadmin"
+    entrypoint:
+      - "/entrypoint.sh"
+    environment:
+      - "PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}"
+      - "PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}"
+      - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    labels:
+      - docker-volume-backup.stop-during-backup=true
+    image: "dpage/pgadmin4:latest"
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.5
+    ports:
+      - "5051:80/tcp"
+    restart: "unless-stopped"
+    user: "pgadmin"
+    volumes:
+      - "pgadmin_data:/var/lib/pgadmin"
+    working_dir: "/pgadmin4"
+    healthcheck:
+      test: ["CMD", "wget", "-O", "-", "http://localhost:80/misc/ping"]
+      interval: 30s
+      timeout: 5s
+
+  file_browser:
+    container_name: "file_browser"
+    image: hurlenko/filebrowser
+    user: "1000:1000"
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.6
+    ports:
+      - 7200:8080/tcp
+    volumes:
+      - nas_media:/data/media
+      - nas_documents:/data/documents
+      - nas_backups:/data/backups
+      - nas_software:/data/software
+      - nas_downloads:/data/downloads
+      - /var/lib/docker/volumes:/data/docker/volumes
+      - file_browser_data:/config
+    environment:
+      - FB_BASEURL=/filebrowser
+    restart: unless-stopped
+    healthcheck:
+      test: "wget --no-verbose --tries=1 --spider http://localhost:8080 || exit 1"
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  volumes_backup:
+    container_name: "volumes_backup"
+    image: offen/docker-volume-backup:latest
+    environment:
+      BACKUP_FILENAME: backup-%Y-%m-%dT%H-%M-%S.tar.gz
+      BACKUP_PRUNING_PREFIX: backup-
+      BACKUP_RETENTION_DAYS: 5
+      BACKUP_CRON_EXPRESSION: 0 3 * * *
+      SSH_HOST_NAME: ${NAS_IP_ADDRESS}
+      SSH_PORT: 22
+      SSH_USER: ${NAS_SSH_USER}
+      SSH_PASSWORD: ${NAS_SSH_PASSWORD}
+      SSH_REMOTE_PATH: container_volumes
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.7
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - file_browser_data:/backup/file_browser_data:ro
+      - keg_monitor_app_data:/backup/keg_monitor_app_data:ro
+      - mqtt_broker_config:/backup/mqtt_broker_config:ro
+      - mqtt_broker_data:/backup/mqtt_broker_data:ro
+      - mqtt_broker_log:/backup/mqtt_broker_log:ro
+      - pgadmin_data:/backup/pgadmin:ro
+      - plex_server_config:/backup/plex_server_config:ro
+      - portainer_data:/backup/portainer_data:ro
+      - postgresql_data:/backup/postgresql_data:ro
+      - home_assistant_data:/backup/home_assistant_data:ro
+      - nginx_proxy_config:/backup/nginx_proxy_config:ro
+      - nginx_proxy_data:/backup/nginx_proxy_data:ro
+      - nginx_proxy_letsencrypt:/backup/nginx_proxy_letsencrypt:ro
+      - vscode_data:/backup/vscode_data:ro
+      - pi_hole_dnsmasq:/backup/pi_hole_dnsmasq:ro
+    restart: unless-stopped
+    healthcheck:
+      test: "exit 0"
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  plex:
+    container_name: "plex"
+    devices:
+      - "/dev/dri:/dev/dri"
+    entrypoint:
+      - "/init"
+    environment:
+      - "PUID=1002"
+      - "PGID=1002"
+      - "VERSION=latest"
+      - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    image: "lscr.io/linuxserver/plex:latest"
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.8
+    ports:
+      - "32400:32400/tcp"
+    restart: "always"
+    volumes:
+      - "plex_server_config:/config"
+      - "nas_media:/mnt/nas/shared/media"
+    working_dir: "/"
+    healthcheck:
+      test: "curl --connect-timeout 15 --max-time 100 --silent --show-error --fail 'http://localhost:32400/identity' >/dev/null"
+      interval: 1m 
+      timeout: 15s 
+      retries: 3 
+      start_period: 1m
+  
+  home_assistant:
+    container_name: "home_assistant"
+    entrypoint:
+      - "/init"
+    image: "docker.io/homeassistant/home-assistant:latest"
+    labels:
+      docker-volume-backup.stop-during-backup: true
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.9
+    ports:
+      - "8123:8123/tcp"
+    privileged: true
+    restart: "unless-stopped"
+    security_opt:
+      - "label=disable"
+    volumes:
+      - "home_assistant_data:/config"
+    working_dir: "/config"
+    healthcheck:
+      test: "curl --connect-timeout 10 --silent -f http://localhost:8123/ || exit 1 "
+      interval: 20s
+      timeout: 10s
+      retries: 5 
+      start_period: 30s
+
+  vs_code:
+    container_name: "vs_code"
+    image: "codercom/code-server:latest"
+    environment:
+      - "PASSWORD=${VSCODE_PASSWORD}"
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.10
+    ports:
+      - 7201:8080/tcp
+    restart: "unless-stopped"
+    volumes:
+      - vscode_data:/home/coder/.local/share/code-server
+      - plex_server_config:/home/coder/projects/plex
+    healthcheck:
+      test: "curl --connect-timeout 10 --silent -f http://localhost:8080/ || exit 1 "
+      interval: 30s
+      timeout: 10s
+      retries: 5 
+      start_period: 20s
+
+  portainer:
+    container_name: "portainer"
+    entrypoint:
+      - "/portainer"
+    environment:
+      - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    image: "portainer/portainer-ce:alpine"
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.30
+    ports:
+      - "9443:9443/tcp"
+    restart: "always"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "portainer_data:/data"
+    working_dir: "/"
+    healthcheck:
+      test: "wget --no-verbose --tries=1 --spider --no-check-certificate https://localhost:9443 || exit 1"
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+  
+  pi_hole:
+    container_name: pi_hole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8080:80/tcp"
+    environment:
+      TZ: '${TIMEZONE}'
+      WEBPASSWORD: '${PIHOLE_WEB_PASSWORD}'
+      FTLCONF_LOCAL_IPV4: '${HOST_IP_ADDRESS}'
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.90
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    volumes:
+      - 'pi_hole_data:/etc/pihole'
+      - 'pi_hole_dnsmasq:/etc/dnsmasq.d'
+    restart: unless-stopped
+  
+  watchtower:
+    container_name: "watchtower"
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime
+      - $HOME/.docker/config.json:/config.json
+    environment:
+      - "WATCHTOWER_CLEANUP=true"
+      - "WATCHTOWER_SCHEDULE=0 0 4 * * *"
+      - "WATCHTOWER_DEBUG=true"
+    restart: unless-stopped
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.97
+
+  cloudflare_ddns:
+    container_name: "cloudflare_ddns"
+    image: "oznu/cloudflare-ddns:latest"
+    environment:
+      - "API_KEY=${CLOUDFLARE_API_KEY}"
+      - "ZONE=${CLOUDFLARE_DNS_ZONE}"
+      - "PROXIED=false"
+      - "CRON=*/30 * * * *"
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.98
+    restart: unless-stopped
+    healthcheck:
+      test: "ping -c 1 www.google.com || exit 1"
+      interval: 5m
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  nginx_proxy:
+    container_name: "nginx_proxy"
+    environment:
+      - "DB_SQLITE_FILE=/config/database.sqlite"
+      - "DISABLE_IPV6=true"
+    image: "jc21/nginx-proxy-manager:latest"
+    network_mode: "bridge"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.99
+    ports:
+       - '80:80'
+       - '443:443'
+       - '81:81'
+       - '853:853'
+    restart: "unless-stopped"
+    volumes:
+      - "nginx_proxy_config:/config"
+      - "nginx_proxy_letsencrypt:/etc/letsencrypt"
+      - "nginx_proxy_data:/data"
+    healthcheck:
+      test: ["CMD", "/bin/check-health"]
+      interval: 10s
+      timeout: 3s
+
+volumes:
+  mqtt_broker_config:
+  mqtt_broker_data:
+  mqtt_broker_log:
+  postgresql_data:
+  keg_monitor_app_data:
+  pgadmin_data:
+  file_browser_data:
+  plex_server_config:
+  portainer_data:
+  home_assistant_data:
+  nginx_proxy_config:
+  nginx_proxy_data:
+  nginx_proxy_letsencrypt:
+  pi_hole_data:
+  pi_hole_dnsmasq:
+  vscode_data:
+  nas_backups:
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
+      device: "	:/mnt/default_pool/backups"
+  nas_documents:
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
+      device: "	:/mnt/default_pool/documents"
+  nas_downloads:
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
+      device: "	:/mnt/default_pool/downloads"
+  nas_media:
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
+      device: "	:/mnt/default_pool/media"
+  nas_software:
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
+      device: "	:/mnt/default_pool/software"
+networks:
+  server_net:
+    driver: bridge
+    ipam: 
+      config:
+        - subnet: 172.18.0.0/16
+        - gateway: 172.18.0.1
