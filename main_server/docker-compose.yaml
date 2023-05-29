@@ -361,6 +361,50 @@ services:
       interval: 10s
       timeout: 3s
 
+  sonarr:
+    container_name: sonarr
+    image: linuxserver/sonarr:latest
+    restart: unless-stopped
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.11
+    ports:
+      - 8989:8989
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIMEZONE}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - sonarr_config:/config
+      - nas_media_tv:/tv
+      - nas_downloads:/downloads
+
+  radarr:
+    container_name: radarr
+    image: linuxserver/radarr:latest
+    restart: unless-stopped
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.12
+    ports:
+      - 7878:7878
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIMEZONE}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - radarr_config:/config
+      - nas_media_movies:/movies
+      - nas_downloads:/downloads
+
 volumes:
   mqtt_broker_config:
     name: mqtt_broker_config
@@ -394,6 +438,10 @@ volumes:
     name: pi_hole_dnsmasq
   vscode_data:
     name: vscode_data
+  sonarr_config:
+    name: sonarr_config
+  radarr_config:
+    name: radarr_config
   nas_backups:
     name: nas_backups
     driver: local
@@ -422,6 +470,20 @@ volumes:
       type: "nfs"
       o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
       device: ":/mnt/default_pool/media"
+  nas_media_tv:
+    name: nas_media_tv
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
+      device: ":/mnt/default_pool/media/videos/tv_shows"
+  nas_media_movies:
+    name: nas_media_movies
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
+      device: ":/mnt/default_pool/media/videos/movies"
   nas_software:
     name: nas_software
     driver: local
