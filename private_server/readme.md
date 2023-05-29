@@ -4,40 +4,18 @@ Ubuntu Linux Server VM setup instructions.
 
 ## Proxmox
 
-TODO
+Follow Instructions [here](/proxmox_setup.md)
 
-* Download Ubuntu Server 22+ ISO [here](https://ubuntu.com/download/server).
-* Add ISO to Proxmox
+## Create VM
 
+* Leave Most Defaults (SeaBIOS, etc)
+* Add *Local_Storage* (no more than half of available space)
+* Use default vmbr0 bridge for networking
+* !Important - Select appropriate VLAN tag for VPN outbound network
 
 ## Linux Install
 
-Mostly choose defaults. Do NOT install docker.
-
-```bash
-sudo apt update
-sudo apt upgrade
-sudo reboot
-```
-
-## Server Prereq Steps
-
-### Install Docker
-
-Install via the *apt repository method*. Follow steps [here](https://docs.docker.com/engine/install/ubuntu/).
-
-### Set Timezone
-
-```bash
-sudo timedatectl set-timezone America/New_York
-```
-
-Confirm:
-
-```bash
-ls -l /etc/localtime
-```
-[Reference](https://linuxize.com/post/how-to-set-or-change-timezone-in-linux/)
+Follow Instructions [here](/linux_setup.md)
 
 ### Traceroute to Test VPN
 

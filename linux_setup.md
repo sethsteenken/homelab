@@ -1,18 +1,15 @@
-# Main Server
+# Linux Setup
 
-Ubuntu Linux Server VM setup instructions.
+## Install
 
-## Proxmox
+Mostly choose defaults. 
 
-TODO
+* Install 3rd-party Software
+* For storage setup, be sure entire size the disk applied to the VM is set under the SIZE of the ubuntu-lv device mounted at /
+* Install OpenSSH Server
+* Do NOT select any Server Snaps
 
-* Download Ubuntu Server 22+ ISO [here](https://ubuntu.com/download/server).
-* Add ISO to Proxmox
-
-
-## Linux Install
-
-Mostly choose defaults. Do NOT install docker.
+After logging into the console or over SSH, run the following:
 
 ```bash
 sudo apt update
