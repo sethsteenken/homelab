@@ -26,3 +26,19 @@ sudo apt install traceroute
 ```bash
 traceroute google.com
 ```
+
+### Docker Compose Setup
+
+Follow [instructions here](/docker_compose.md) to setup docker-compose.yaml.
+
+Environment variables for .env file:
+
+`
+NAS_IP_ADDRESS=
+PUID=
+PGID=
+TIMEZONE=
+WATCHTOWER_SCHEDULE=
+WATCHTOWER_DEBUG=
+`
+

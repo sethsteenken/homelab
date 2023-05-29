@@ -11,14 +11,14 @@ services:
       - TZ=${TIMEZONE}
     ports:
       - 8112:8112
-      - 6881:6881
+      - 6881:6881/tcp
       - 6881:6881/udp
     volumes:
       - auto_download_watch:/downloads-watch
       - active_downloads:/downloads-active
       - deluge_config:/config
       - nas_downloads:/downloads-completed
-  
+
   jackett:
     container_name: jackett
     image: linuxserver/jackett:latest
@@ -52,7 +52,7 @@ services:
 
   portainer_agent:
     container_name: "portainer_agent"
-    image: portainer/agent:2.18.3
+    image: portainer/agent:latest
     restart: always
     network_mode: "bridge"
     ports:
@@ -63,12 +63,17 @@ services:
 
 volumes:
   auto_download_watch:
+    name: "auto_download_watch"
   active_downloads:
+    name: "active_downloads"
   nas_downloads:
+    name: "nas_downloads"
     driver: local
     driver_opts:
       type: "nfs"
       o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
-      device: "	:/mnt/default_pool/downloads"
+      device: ":/mnt/default_pool/downloads"
   deluge_config: 
+    name: "deluge_config"
   jackett_config:
+    name: "jackett_config"

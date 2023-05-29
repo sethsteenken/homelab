@@ -35,13 +35,7 @@ docker login
 
 ### Docker Compose Setup
 
-Copy contents of [docker-compose.yaml](/main_server/docker-compose.yaml) into home folder, optionally into a sub folder.
-
-Create .env file. Note: the file will be hidden.
-
-```bash
-touch .env
-```
+Follow [instructions here](/docker_compose.md) to setup docker-compose.yaml.
 
 Environment variables for .env file:
 
