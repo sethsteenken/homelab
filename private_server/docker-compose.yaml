@@ -17,7 +17,7 @@ services:
       - auto_download_watch:/downloads-watch
       - active_downloads:/downloads-active
       - deluge_config:/config
-      - nas_downloads:/downloads-completed
+      - nas_downloads:/downloads
 
   jackett:
     container_name: jackett
@@ -33,7 +33,7 @@ services:
       - 9117:9117
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - auto_download_watch:/downloads # place where to put .torrent files for manual download
+      - auto_download_watch:/downloads-watch
       - jackett_config:/config
 
   watchtower:
