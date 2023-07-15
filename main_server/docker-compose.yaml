@@ -58,6 +58,9 @@ services:
     image: "thedinklage/kegmonitor:latest"
     ports:
       - "7101:80/tcp"
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     networks:
       server_net:
         ipv4_address: 172.18.0.4
