@@ -75,8 +75,6 @@ services:
       - "Mqtt__Port=1883"
       - "Mqtt__Username=keg_monitor_web_user"
       - "Mqtt__Password=${KEGMONITOR_MQTT_PASSWORD}"
-    extra_hosts:
-      - "${KEGMONITOR_DOMAIN}:192.168.1.13"
     volumes:
       - "keg_monitor_app_data:/app/wwwroot/uploads"
     working_dir: "/app"
