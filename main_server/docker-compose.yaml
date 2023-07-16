@@ -55,7 +55,7 @@ services:
 
   kegmonitor:
     container_name: "kegmonitor"
-    image: "thedinklage/kegmonitor:latest"
+    image: "sethsteenken/kegmonitor:latest"
     ports:
       - "7101:80/tcp"
     dns:
