@@ -66,6 +66,7 @@ services:
         ipv4_address: 172.18.0.4
     environment:
       - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      - "TZ=${TIMEZONE}"
       - "ASPNETCORE_ENVIRONMENT=Production"
       - "ConnectionStrings__DefaultConnection=${KEGMONITOR_CONN_STRING}"
       - "WebDomain=https://${KEGMONITOR_DOMAIN}"
