@@ -22,7 +22,6 @@ docker run -d --name temp_restore_container \
 -v nginx_proxy_data:/backup_restore/nginx_proxy_data \
 -v nginx_proxy_letsencrypt:/backup_restore/nginx_proxy_letsencrypt \
 -v pi_hole_dnsmasq:/backup_restore/pi_hole_dnsmasq \
--v vscode_data:/backup_restore/vscode_data \
 alpine
 
 docker cp /tmp/backup/mqtt_broker_config/. temp_restore_container:/backup_restore/mqtt_broker_config
@@ -39,7 +38,6 @@ docker cp /tmp/backup/nginx_proxy_config/. temp_restore_container:/backup_restor
 docker cp /tmp/backup/nginx_proxy_data/. temp_restore_container:/backup_restore/nginx_proxy_data
 docker cp /tmp/backup/nginx_proxy_letsencrypt/. temp_restore_container:/backup_restore/nginx_proxy_letsencrypt
 docker cp /tmp/backup/pi_hole_dnsmasq/. temp_restore_container:/backup_restore/pi_hole_dnsmasq
-docker cp /tmp/backup/vscode_data/. temp_restore_container:/backup_restore/vscode_data
 
 docker stop temp_restore_container
 docker rm temp_restore_container
