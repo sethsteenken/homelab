@@ -38,7 +38,8 @@ services:
       - "POSTGRES_USER=${POSTGRES_USER}"
     labels:
       - docker-volume-backup.stop-during-backup=true
-    image: "postgres:latest"
+      - com.centurylinklabs.watchtower.enable=false
+    image: "postgres:${POSTGRES_VERSION}"
     networks:
       server_net:
         ipv4_address: 172.18.0.3
@@ -172,7 +173,6 @@ services:
       - nginx_proxy_config:/backup/nginx_proxy_config:ro
       - nginx_proxy_data:/backup/nginx_proxy_data:ro
       - nginx_proxy_letsencrypt:/backup/nginx_proxy_letsencrypt:ro
-      - vscode_data:/backup/vscode_data:ro
       - pi_hole_dnsmasq:/backup/pi_hole_dnsmasq:ro
     restart: unless-stopped
     healthcheck:
@@ -236,27 +236,6 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
-
-  vs_code:
-    container_name: "vs_code"
-    image: "codercom/code-server:latest"
-    environment:
-      - "PASSWORD=${VSCODE_PASSWORD}"
-    networks:
-      server_net:
-        ipv4_address: 172.18.0.10
-    ports:
-      - 7201:8080/tcp
-    restart: "unless-stopped"
-    volumes:
-      - vscode_data:/home/coder/.local/share/code-server
-      - plex_server_config:/home/coder/projects/plex
-    healthcheck:
-      test: "curl --connect-timeout 10 --silent -f http://localhost:8080/ || exit 1 "
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 20s
 
   portainer:
     container_name: "portainer"
@@ -438,8 +417,6 @@ volumes:
     name: pi_hole_data
   pi_hole_dnsmasq:
     name: pi_hole_dnsmasq
-  vscode_data:
-    name: vscode_data
   sonarr_config:
     name: sonarr_config
   radarr_config:
