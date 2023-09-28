@@ -42,7 +42,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
-      - $HOME/.docker/config.json:/config.json
     environment:
       - "WATCHTOWER_CLEANUP=true"
       - "WATCHTOWER_SCHEDULE=${WATCHTOWER_SCHEDULE}"
