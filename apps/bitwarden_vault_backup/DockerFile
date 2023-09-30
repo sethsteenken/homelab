@@ -1,0 +1,10 @@
+FROM alpine:latest
+
+RUN apt-get update
+RUN apt-get -y install cron
+RUN apt-get -y install snapd
+RUN snap install bw
+
+COPY script.sh script.sh
+
+RUN script.sh
