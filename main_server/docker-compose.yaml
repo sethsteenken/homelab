@@ -386,6 +386,23 @@ services:
       - nas_media_movies:/movies
       - nas_downloads:/downloads
 
+  server_healthcheck:
+    container_name: server_healthcheck
+    image: sethsteenken/http-pinger:latest
+    restart: unless-stopped
+    environment:
+      - URL=${HEALTHCHECKSIO_URL}
+      - CRON_SCHEDULE=${HEALTHCHECKSIO_CRON_SCHEDULE}
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.13
+    healthcheck:
+      test: "curl --connect-timeout 10 --silent -f ${HEALTHCHECKSIO_STATUS_URL} | jq .status == \"up\" || exit 1"
+      interval: 10m
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
 volumes:
   mqtt_broker_config:
     name: mqtt_broker_config
