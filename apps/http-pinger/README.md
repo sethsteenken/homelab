@@ -12,7 +12,7 @@ To use this image, you need to provide the following environment variables:
 # Build and Run
 docker build . -t sethsteenken/http-pinger
 
-docker run -d -e URL="https://hc-ping.com/c60c616f-371c-4f09-a827-e99fc9f1e860" -e CRON_SCHEDULE="* * * * *" http-pinger 
+docker run -d -e URL="url-to-ping" -e CRON_SCHEDULE="* * * * *" http-pinger 
 
 # Docker Hub
 
