@@ -396,12 +396,6 @@ services:
     networks:
       server_net:
         ipv4_address: 172.18.0.13
-    healthcheck:
-      test: "curl --connect-timeout 10 --silent -f ${HEALTHCHECKSIO_STATUS_URL} | jq .status == \"up\" || exit 1"
-      interval: 10m
-      timeout: 10s
-      retries: 5
-      start_period: 20s
 
 volumes:
   mqtt_broker_config:
