@@ -60,6 +60,15 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/volumes:/var/lib/docker/volumes
 
+  server_healthcheck:
+    container_name: server_healthcheck
+    image: sethsteenken/http-pinger:latest
+    restart: unless-stopped
+    environment:
+      - URL=${HEALTHCHECKSIO_URL}
+      - CRON_SCHEDULE=${HEALTHCHECKSIO_CRON_SCHEDULE}
+    network_mode: "bridge"
+
 volumes:
   auto_download_watch:
     name: "auto_download_watch"
