@@ -396,6 +396,25 @@ services:
     networks:
       server_net:
         ipv4_address: 172.18.0.13
+  
+  containers_healthcheck:
+    container_name: containers_healthcheck
+    image:  petersem/monocker:latest
+    restart: unless-stopped
+    environment:
+      - "SERVER_LABEL=Main Server"
+      - "MESSAGE_PLATFORM=${CONTAINERS_HEALTHCHECK_DISCORD_WEBHOOK}"
+      - "ONLY_OFFLINE_STATES=true"
+      - "EXCLUDE_EXITED=false"  
+      - "LABEL_ENABLE=false"    
+      - "PERIOD=30"
+      - "SHA=false"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.14
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime
 
 volumes:
   mqtt_broker_config:
