@@ -39,7 +39,7 @@ Follow [instructions here](/docker_compose.md) to setup docker-compose.yaml.
 
 Environment variables for .env file:
 
-`
+```bash
 HOST_IP_ADDRESS=
 NAS_IP_ADDRESS=
 LOCAL_DNS_ADDRESS=
@@ -60,10 +60,19 @@ TIMEZONE=
 CLOUDFLARE_DNS_ZONE=
 CLOUDFLARE_API_KEY=
 CONTAINERS_HEALTHCHECK_DISCORD_WEBHOOK=
-`
+```
 
 ## Run Docker Compose
 
 `
 sudo docker compose up -d
 `
+
+## Task Schedule
+
+| Task       | Dataset    | Schedule   |
+|------------|------------|------------|
+| Volumes Backup | * | Daily 3am |
+| Watchtower | * | Daily 4am |
+| Plex Cleanup | * | Daily 1am-2am |
+| Healthchecks.io | * | Every 10 minutes |
