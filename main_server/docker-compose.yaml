@@ -1,4 +1,3 @@
-version: "3.6"
 services:
   mqtt_broker:
     container_name: "mqtt_broker"
@@ -429,6 +428,24 @@ services:
     networks:
       server_net:
         ipv4_address: 172.18.0.15
+  
+  qdirstat:
+    container_name: qdirstat
+    image: lscr.io/linuxserver/qdirstat:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIMEZONE}
+    volumes:
+      - qdirstat_config:/config
+      - nas_default_pool_readonly:/data
+    ports:
+      - 3005:3000
+      - 3006:3001
+    restart: unless-stopped
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.16
     
 volumes:
   mqtt_broker_config:
@@ -467,6 +484,8 @@ volumes:
     name: radarr_config
   services_monitor_data:
     name: services_monitor_data
+  qdirstat_config:
+    name: qdirstat_config
   nas_backups:
     name: nas_backups
     driver: local
@@ -516,6 +535,13 @@ volumes:
       type: "nfs"
       o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
       device: ":/mnt/default_pool/software"
+  nas_default_pool_readonly:
+    name: nas_default_pool_readonly
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4,ro"
+      device: ":/mnt/default_pool"
 networks:
   server_net:
     name: server_net
