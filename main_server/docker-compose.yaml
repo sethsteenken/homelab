@@ -422,6 +422,9 @@ services:
     container_name: services_monitor
     image: louislam/uptime-kuma:1
     restart: unless-stopped
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     volumes:
       - services_monitor_data:/app/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
