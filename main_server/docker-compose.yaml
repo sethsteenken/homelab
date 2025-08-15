@@ -451,6 +451,22 @@ services:
     networks:
       server_net:
         ipv4_address: 172.18.0.16
+
+  foundry_virtual_tabletop:
+    container_name: foundry_virtual_tabletop
+    image: felddy/foundryvtt:13
+    volumes:
+      - foundry_virtual_tabletop_data:/data
+    environment:
+      - FOUNDRY_PASSWORD=${FOUNDRY_VTT_PASSWORD}
+      - FOUNDRY_USERNAME=${FOUNDRY_VTT_USERNAME}
+      - FOUNDRY_ADMIN_KEY=atropos
+    ports:
+       - 30000:30000
+    restart: unless-stopped
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.17
     
 volumes:
   mqtt_broker_config:
@@ -491,6 +507,8 @@ volumes:
     name: services_monitor_data
   qdirstat_config:
     name: qdirstat_config
+  foundry_virtual_tabletop_data:
+    name: foundry_virtual_tabletop_data
   nas_backups:
     name: nas_backups
     driver: local
@@ -547,6 +565,13 @@ volumes:
       type: "nfs"
       o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4,ro"
       device: ":/mnt/default_pool"
+  nas_gaming_foundry_tabletop:
+    name: nas_gaming_foundry_tabletop
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
+      device: ":/mnt/default_pool/gaming_foundry_tabletop"
 networks:
   server_net:
     name: server_net
