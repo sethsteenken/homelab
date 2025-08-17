@@ -17,6 +17,9 @@ services:
     ports:
       - "1883:1883/tcp"
     restart: "unless-stopped"
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     volumes:
       - "mqtt_broker_config:/mosquitto/config"
       - "mqtt_broker_data:/mosquitto/data"
@@ -45,6 +48,9 @@ services:
     ports:
       - "5432:5432/tcp"
     restart: "unless-stopped"
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     volumes:
       - "postgresql_data:/var/lib/postgresql/data"
     healthcheck:
@@ -105,6 +111,9 @@ services:
     ports:
       - "5051:80/tcp"
     restart: "unless-stopped"
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     user: "pgadmin"
     volumes:
       - "pgadmin_data:/var/lib/pgadmin"
@@ -134,6 +143,9 @@ services:
     environment:
       - FB_BASEURL=/filebrowser
     restart: unless-stopped
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     healthcheck:
       test: "wget --no-verbose --tries=1 --spider http://localhost:8080 || exit 1"
       interval: 60s
@@ -177,6 +189,9 @@ services:
       - pi_hole_dnsmasq:/backup/pi_hole_dnsmasq:ro
       - services_monitor_data:/backup/services_monitor_data:ro
     restart: unless-stopped
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     healthcheck:
       test: "exit 0"
       interval: 60s
@@ -202,6 +217,9 @@ services:
     ports:
       - "32400:32400/tcp"
     restart: "always"
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     volumes:
       - "plex_server_config:/config"
       - "nas_media:/mnt/nas/shared/media"
@@ -227,6 +245,9 @@ services:
       - "8123:8123/tcp"
     privileged: true
     restart: "unless-stopped"
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     security_opt:
       - "label=disable"
     volumes:
@@ -252,6 +273,9 @@ services:
     ports:
       - "9443:9443/tcp"
     restart: "always"
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "portainer_data:/data"
@@ -297,6 +321,9 @@ services:
       - "WATCHTOWER_SCHEDULE=0 0 4 * * *"
       - "WATCHTOWER_DEBUG=true"
     restart: unless-stopped
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     networks:
       server_net:
         ipv4_address: 172.18.0.97
@@ -313,6 +340,9 @@ services:
       server_net:
         ipv4_address: 172.18.0.98
     restart: unless-stopped
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     healthcheck:
       test: "ping -c 1 www.google.com || exit 1"
       interval: 5m
@@ -335,6 +365,9 @@ services:
        - '81:81'
        - '853:853'
     restart: "unless-stopped"
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     volumes:
       - "nginx_proxy_config:/config"
       - "nginx_proxy_letsencrypt:/etc/letsencrypt"
@@ -392,6 +425,9 @@ services:
     container_name: server_healthcheck
     image: sethsteenken/http-pinger:latest
     restart: unless-stopped
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     environment:
       - URL=${HEALTHCHECKSIO_URL}
       - CRON_SCHEDULE=${HEALTHCHECKSIO_CRON_SCHEDULE}
@@ -403,6 +439,9 @@ services:
     container_name: containers_healthcheck
     image:  petersem/monocker:latest
     restart: unless-stopped
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     environment:
       - "SERVER_LABEL=Main Server"
       - "MESSAGE_PLATFORM=${CONTAINERS_HEALTHCHECK_DISCORD_WEBHOOK}"
@@ -448,6 +487,9 @@ services:
       - 3005:3000
       - 3006:3001
     restart: unless-stopped
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     networks:
       server_net:
         ipv4_address: 172.18.0.16
@@ -464,6 +506,9 @@ services:
     ports:
        - 30000:30000
     restart: unless-stopped
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
     networks:
       server_net:
         ipv4_address: 172.18.0.17
