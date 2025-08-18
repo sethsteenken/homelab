@@ -4,7 +4,7 @@ Ubuntu Linux Server VM setup instructions.
 
 ## Proxmox
 
-Follow Instructions [here](/proxmox_setup.md)
+Follow [Instructions](/proxmox_setup.md)
 
 ## Create VM
 
@@ -14,7 +14,7 @@ Follow Instructions [here](/proxmox_setup.md)
 
 ## Linux Install
 
-Follow Instructions [here](/linux_setup.md)
+Follow [Instructions](/linux_setup.md)
 
 ## Docker Prereqs
 

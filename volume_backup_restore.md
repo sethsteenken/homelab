@@ -5,6 +5,7 @@
 Copy *tar.gz package to the server via [PSCP](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html).
 
 Extract contents:
+
 ```bash
 tar -C /tmp -xvf  backup.tar.gz
 ```
@@ -19,6 +20,3 @@ docker cp /tmp/backup/data/. temp_restore_container:/backup_restore
 docker stop temp_restore_container
 docker rm temp_restore_container
 ```
-
-
-

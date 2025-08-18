@@ -42,6 +42,3 @@ docker cp /tmp/backup/pi_hole_dnsmasq/. temp_restore_container:/backup_restore/p
 docker stop temp_restore_container
 docker rm temp_restore_container
 ```
-
-
-

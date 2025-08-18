@@ -21,7 +21,7 @@ sudo reboot
 
 ### Install Docker
 
-Install via the *apt repository method*. Follow steps [here](https://docs.docker.com/engine/install/ubuntu/).
+Install via the [*apt repository method*](https://docs.docker.com/engine/install/ubuntu/).
 
 ### Set Timezone
 
@@ -34,5 +34,5 @@ Confirm:
 ```bash
 ls -l /etc/localtime
 ```
-[Reference](https://linuxize.com/post/how-to-set-or-change-timezone-in-linux/)
 
+[Reference](https://linuxize.com/post/how-to-set-or-change-timezone-in-linux/)
