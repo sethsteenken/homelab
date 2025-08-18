@@ -498,7 +498,7 @@ services:
     container_name: foundry_virtual_tabletop
     image: felddy/foundryvtt:13
     volumes:
-      - foundry_virtual_tabletop_data:/data
+      - nas_gaming_foundry_tabletop:/data
     environment:
       - FOUNDRY_PASSWORD=${FOUNDRY_VTT_PASSWORD}
       - FOUNDRY_USERNAME=${FOUNDRY_VTT_USERNAME}

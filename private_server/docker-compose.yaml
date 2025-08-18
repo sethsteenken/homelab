@@ -72,8 +72,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/volumes:/var/lib/docker/volumes
 
-  server_healthcheck:
-    container_name: server_healthcheck
+  server_health_pinger:
+    container_name: server_health_pinger
     image: sethsteenken/http-pinger:latest
     restart: unless-stopped
     environment:

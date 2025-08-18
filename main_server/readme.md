@@ -67,11 +67,37 @@ HEALTHCHECKSIO_CRON_SCHEDULE=
 HEALTHCHECKSIO_STATUS_URL=
 ```
 
+## Mount NAS Shares
+
+### Install NFS Client
+
+See [details on nfs-common package](https://phoenixnap.com/kb/ubuntu-nfs-server#How_to_Install_NFS_Client).
+
+```bash
+sudo apt update
+sudo apt install nfs-common
+```
+
+### Mount NFS Shares
+
+Using the [mount](https://phoenixnap.com/kb/linux-mount-command) commands below, mount the required shares from the NAS to the host Linux server.
+
+NOTE: creating the docker volume via the command below instead of using Docker Compose later will cause a warning about the volume not being created by Docker Compose and how it should be labeled `external`. It may be better to wait until Docker Compose event to mount the NFS shares to the volumes.
+
+```bash
+sudo docker volume create --driver local --opt type=nfs --opt o=addr=<NAS IP ADDRESS>,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4 --opt device=:/mnt/<pool name>/<share name> <volume name>
+
+sudo bash
+mount -t nfs4 <NAS IP ADDRESS>:/mnt/<pool name>/<share name> /var/lib/docker/volumes/<volume name>/_data -o rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+```
+
+See the latest [Docker Compose file](docker-compose.yaml) for the list of shares and volume names to use.
+
 ## Run Docker Compose
 
-`
+```bash
 sudo docker compose up -d
-`
+```
 
 ## Task Schedule
 
