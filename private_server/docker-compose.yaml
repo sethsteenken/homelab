@@ -17,8 +17,7 @@ services:
     volumes:
       - auto_download_watch:/downloads-watch
       - nas_downloads_active:/downloads-active
-      - nas_downloads_completed:/downloads-completed
-      - nas_downloads:/downloads
+      - nas_downloads_completed:/downloads # needs to match with *arr suite, so '/downloads' is required
       - deluge_config:/config
 
   jackett:
@@ -97,13 +96,6 @@ services:
 volumes:
   auto_download_watch:
     name: "auto_download_watch"
-  nas_downloads:
-    name: "nas_downloads"
-    driver: local
-    driver_opts:
-      type: "nfs"
-      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
-      device: ":/mnt/default_pool/downloads"
   nas_downloads_active:
     name: "nas_downloads_active"
     driver: local

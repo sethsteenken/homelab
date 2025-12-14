@@ -397,7 +397,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - sonarr_config:/config
       - nas_media_tv:/tv
-      - nas_downloads:/downloads
+      - nas_downloads_completed:/downloads
 
   radarr:
     container_name: radarr
@@ -419,7 +419,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - radarr_config:/config
       - nas_media_movies:/movies
-      - nas_downloads:/downloads
+      - nas_downloads_completed:/downloads
 
   server_health_pinger:
     container_name: server_health_pinger
@@ -575,6 +575,13 @@ volumes:
       type: "nfs"
       o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
       device: ":/mnt/default_pool/downloads"
+  nas_downloads_completed:
+    name: "nas_downloads_completed"
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
+      device: ":/mnt/default_pool/downloads/_torrents/completed"
   nas_media:
     name: nas_media
     driver: local
