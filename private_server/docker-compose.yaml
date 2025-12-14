@@ -98,7 +98,7 @@ volumes:
   auto_download_watch:
     name: "auto_download_watch"
   nas_downloads:
-    name: "nas_downloads_active"
+    name: "nas_downloads"
     driver: local
     driver_opts:
       type: "nfs"
