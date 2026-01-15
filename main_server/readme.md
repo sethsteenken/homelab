@@ -78,6 +78,10 @@ sudo apt update
 sudo apt install nfs-common
 ```
 
+### Mount Samba Shares
+
+Mount Samba shares directly via IP and credentials on the docker volume configuration in `docker-compose.yaml`. See [Mounting Samba Shares](https://docs.docker.com/engine/storage/volumes/#create-cifssamba-volumes) for more details.
+
 ### Mount NFS Shares
 
 Using the [mount](https://phoenixnap.com/kb/linux-mount-command) commands below, mount the required shares from the NAS to the host Linux server.

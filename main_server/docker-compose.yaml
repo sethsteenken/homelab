@@ -161,11 +161,6 @@ services:
       BACKUP_PRUNING_PREFIX: backup-
       BACKUP_RETENTION_DAYS: 5
       BACKUP_CRON_EXPRESSION: 0 3 * * *
-      SSH_HOST_NAME: ${NAS_IP_ADDRESS}
-      SSH_PORT: 22
-      SSH_USER: ${NAS_SSH_USER}
-      SSH_PASSWORD: ${NAS_SSH_PASSWORD}
-      SSH_REMOTE_PATH: container_volumes
     networks:
       server_net:
         ipv4_address: 172.18.0.7
@@ -173,6 +168,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - nas_backups_container_volumes:/archive # /archive is where backups stored "locally", so drops into NAS
       - file_browser_data:/backup/file_browser_data:ro
       - keg_monitor_app_data:/backup/keg_monitor_app_data:ro
       - mqtt_broker_config:/backup/mqtt_broker_config:ro
@@ -182,7 +178,6 @@ services:
       - plex_server_config:/backup/plex_server_config:ro
       - portainer_data:/backup/portainer_data:ro
       - postgresql_data:/backup/postgresql_data:ro
-      - home_assistant_data:/backup/home_assistant_data:ro
       - nginx_proxy_config:/backup/nginx_proxy_config:ro
       - nginx_proxy_data:/backup/nginx_proxy_data:ro
       - nginx_proxy_letsencrypt:/backup/nginx_proxy_letsencrypt:ro
@@ -230,35 +225,6 @@ services:
       timeout: 15s
       retries: 3
       start_period: 1m
-
-  home_assistant:
-    container_name: "home_assistant"
-    entrypoint:
-      - "/init"
-    image: "docker.io/homeassistant/home-assistant:latest"
-    labels:
-      docker-volume-backup.stop-during-backup: true
-    networks:
-      server_net:
-        ipv4_address: 172.18.0.9
-    ports:
-      - "8123:8123/tcp"
-    privileged: true
-    restart: "unless-stopped"
-    dns:
-      - 172.18.0.90
-      - 1.1.1.1
-    security_opt:
-      - "label=disable"
-    volumes:
-      - "home_assistant_data:/config"
-    working_dir: "/config"
-    healthcheck:
-      test: "curl --connect-timeout 10 --silent -f http://localhost:8123/ || exit 1 "
-      interval: 20s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
 
   portainer:
     container_name: "portainer"
@@ -434,7 +400,7 @@ services:
     networks:
       server_net:
         ipv4_address: 172.18.0.13
-  
+
   containers_healthcheck:
     container_name: containers_healthcheck
     image:  petersem/monocker:latest
@@ -446,8 +412,8 @@ services:
       - "SERVER_LABEL=Main Server"
       - "MESSAGE_PLATFORM=${CONTAINERS_HEALTHCHECK_DISCORD_WEBHOOK}"
       - "ONLY_OFFLINE_STATES=true"
-      - "EXCLUDE_EXITED=false"  
-      - "LABEL_ENABLE=false"    
+      - "EXCLUDE_EXITED=false"
+      - "LABEL_ENABLE=false"
       - "PERIOD=30"
       - "SHA=false"
     networks:
@@ -456,7 +422,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/localtime:/etc/localtime
-  
+
   services_monitor:
     container_name: services_monitor
     image: louislam/uptime-kuma:1
@@ -472,7 +438,7 @@ services:
     networks:
       server_net:
         ipv4_address: 172.18.0.15
-  
+
   qdirstat:
     container_name: qdirstat
     image: lscr.io/linuxserver/qdirstat:latest
@@ -482,7 +448,11 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - qdirstat_config:/config
-      - nas_default_pool_readonly:/data
+      - nas_media:/data/media
+      - nas_software:/data/software
+      - nas_documents:/data/documents
+      - nas_downloads:/data/downloads
+      - nas_backups:/data/backups
     ports:
       - 3005:3000
       - 3006:3001
@@ -494,25 +464,6 @@ services:
       server_net:
         ipv4_address: 172.18.0.16
 
-  foundry_virtual_tabletop:
-    container_name: foundry_virtual_tabletop
-    image: felddy/foundryvtt:13
-    volumes:
-      - nas_gaming_foundry_tabletop:/data
-    environment:
-      - FOUNDRY_PASSWORD=${FOUNDRY_VTT_PASSWORD}
-      - FOUNDRY_USERNAME=${FOUNDRY_VTT_USERNAME}
-      - FOUNDRY_ADMIN_KEY=atropos
-    ports:
-       - 30000:30000
-    restart: unless-stopped
-    dns:
-      - 172.18.0.90
-      - 1.1.1.1
-    networks:
-      server_net:
-        ipv4_address: 172.18.0.17
-    
 volumes:
   mqtt_broker_config:
     name: mqtt_broker_config
@@ -532,8 +483,6 @@ volumes:
     name: plex_server_config
   portainer_data:
     name: portainer_data
-  home_assistant_data:
-    name: home_assistant_data
   nginx_proxy_config:
     name: nginx_proxy_config
   nginx_proxy_data:
@@ -552,78 +501,69 @@ volumes:
     name: services_monitor_data
   qdirstat_config:
     name: qdirstat_config
-  foundry_virtual_tabletop_data:
-    name: foundry_virtual_tabletop_data
   nas_backups:
     name: nas_backups
     driver: local
     driver_opts:
-      type: "nfs"
-      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
-      device: ":/mnt/default_pool/backups"
+      type: "cifs"
+      o: "username=${NAS_USER},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
+      device: "//${NAS_IP_ADDRESS}/backups"
+  nas_backups_container_volumes:
+    name: nas_backups_container_volumes
+    driver: local
+    driver_opts:
+      type: "cifs"
+      o: "username=${NAS_BACKUPS_USER},password=${NAS_BACKUPS_PASSWORD},file_mode=0777,dir_mode=0777"
+      device: "//${NAS_IP_ADDRESS}/backups/container_volumes"
   nas_documents:
     name: nas_documents
     driver: local
     driver_opts:
-      type: "nfs"
-      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
-      device: ":/mnt/default_pool/documents"
+      type: "cifs"
+      o: "username=${NAS_USER},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
+      device: "//${NAS_IP_ADDRESS}/documents"
   nas_downloads:
     name: nas_downloads
     driver: local
     driver_opts:
-      type: "nfs"
-      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
-      device: ":/mnt/default_pool/downloads"
+      type: "cifs"
+      o: "username=${NAS_USER},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
+      device: "//${NAS_IP_ADDRESS}/downloads"
   nas_downloads_completed:
     name: "nas_downloads_completed"
     driver: local
     driver_opts:
-      type: "nfs"
-      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
-      device: ":/mnt/default_pool/downloads/_torrents/completed"
+      type: "cifs"
+      o: "username=${NAS_USER},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
+      device: "//${NAS_IP_ADDRESS}/downloads/_torrents/completed"
   nas_media:
     name: nas_media
     driver: local
     driver_opts:
-      type: "nfs"
-      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
-      device: ":/mnt/default_pool/media"
+      type: "cifs"
+      o: "username=${NAS_USER},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
+      device: "//${NAS_IP_ADDRESS}/media"
   nas_media_tv:
     name: nas_media_tv
     driver: local
     driver_opts:
-      type: "nfs"
-      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
-      device: ":/mnt/default_pool/media/videos/tv_shows"
+      type: "cifs"
+      o: "username=${NAS_USER},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
+      device: "//${NAS_IP_ADDRESS}/media/videos/tv_shows"
   nas_media_movies:
     name: nas_media_movies
     driver: local
     driver_opts:
-      type: "nfs"
-      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
-      device: ":/mnt/default_pool/media/videos/movies"
+      type: "cifs"
+      o: "username=${NAS_USER},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
+      device: "//${NAS_IP_ADDRESS}/media/videos/movies"
   nas_software:
     name: nas_software
     driver: local
     driver_opts:
-      type: "nfs"
-      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
-      device: ":/mnt/default_pool/software"
-  nas_default_pool_readonly:
-    name: nas_default_pool_readonly
-    driver: local
-    driver_opts:
-      type: "nfs"
-      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4,ro"
-      device: ":/mnt/default_pool"
-  nas_gaming_foundry_tabletop:
-    name: nas_gaming_foundry_tabletop
-    driver: local
-    driver_opts:
-      type: "nfs"
-      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
-      device: ":/mnt/default_pool/gaming_foundry_tabletop"
+      type: "cifs"
+      o: "username=${NAS_USER},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
+      device: "//${NAS_IP_ADDRESS}/software"
 networks:
   server_net:
     name: server_net

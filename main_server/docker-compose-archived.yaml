@@ -1,0 +1,69 @@
+services:
+
+  home_assistant:
+    container_name: "home_assistant"
+    entrypoint:
+      - "/init"
+    image: "docker.io/homeassistant/home-assistant:latest"
+    labels:
+      docker-volume-backup.stop-during-backup: true
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.9
+    ports:
+      - "8123:8123/tcp"
+    privileged: true
+    restart: "unless-stopped"
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
+    security_opt:
+      - "label=disable"
+    volumes:
+      - "home_assistant_data:/config"
+    working_dir: "/config"
+    healthcheck:
+      test: "curl --connect-timeout 10 --silent -f http://localhost:8123/ || exit 1 "
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+  foundry_virtual_tabletop:
+    container_name: foundry_virtual_tabletop
+    image: felddy/foundryvtt:13
+    volumes:
+      - nas_gaming_foundry_tabletop:/data
+    environment:
+      - FOUNDRY_PASSWORD=${FOUNDRY_VTT_PASSWORD}
+      - FOUNDRY_USERNAME=${FOUNDRY_VTT_USERNAME}
+      - FOUNDRY_ADMIN_KEY=atropos
+    ports:
+       - 30000:30000
+    restart: unless-stopped
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.17
+    
+volumes:
+  home_assistant_data:
+    name: home_assistant_data
+  foundry_virtual_tabletop_data:
+    name: foundry_virtual_tabletop_data
+  nas_gaming_foundry_tabletop:
+    name: nas_gaming_foundry_tabletop
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
+      device: ":/mnt/default_pool/gaming_foundry_tabletop"
+networks:
+  server_net:
+    name: server_net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+          gateway: 172.18.0.1
