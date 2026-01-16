@@ -46,12 +46,46 @@ services:
     networks:
       server_net:
         ipv4_address: 172.18.0.17
+
+  plex:
+    container_name: "plex"
+    devices:
+      - "/dev/dri:/dev/dri"
+    entrypoint:
+      - "/init"
+    environment:
+      - "PUID=1000"
+      - "PGID=1000"
+      - "VERSION=latest"
+      - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    image: "lscr.io/linuxserver/plex:latest"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.8
+    ports:
+      - "32400:32400/tcp"
+    restart: "always"
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
+    volumes:
+      - "plex_server_config:/config"
+      - "nas_media:/mnt/nas/shared/media"
+    working_dir: "/"
+    healthcheck:
+      test: "curl --connect-timeout 15 --max-time 100 --silent --show-error --fail 'http://localhost:32400/identity' >/dev/null"
+      interval: 1m
+      timeout: 15s
+      retries: 3
+      start_period: 1m
     
 volumes:
   home_assistant_data:
     name: home_assistant_data
   foundry_virtual_tabletop_data:
     name: foundry_virtual_tabletop_data
+  plex_server_config:
+    name: plex_server_config
   nas_gaming_foundry_tabletop:
     name: nas_gaming_foundry_tabletop
     driver: local

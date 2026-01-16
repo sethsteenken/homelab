@@ -1,0 +1,157 @@
+services:
+  volumes_backup:
+    container_name: "volumes_backup"
+    image: offen/docker-volume-backup:latest
+    environment:
+      BACKUP_FILENAME: backup-secondary-%Y-%m-%dT%H-%M-%S.tar.gz
+      BACKUP_PRUNING_PREFIX: backup-secondary-
+      BACKUP_RETENTION_DAYS: 5
+      BACKUP_CRON_EXPRESSION: 0 3 * * *
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.5
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - nas_backups_container_volumes:/archive # /archive is where backups stored "locally", so drops into NAS
+      - plex_server_config:/backup/plex_server_config:ro
+      - pi_hole_dnsmasq:/backup/pi_hole_dnsmasq:ro
+    restart: unless-stopped
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
+    healthcheck:
+      test: "exit 0"
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  plex:
+    container_name: "plex"
+    entrypoint:
+      - "/init"
+    environment:
+      - "PUID=1000"
+      - "PGID=1000"
+      - "VERSION=latest"
+      - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    image: "linuxserver/plex:latest"
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.6
+    ports:
+      - "32400:32400/tcp"
+    restart: "always"
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
+    volumes:
+      - "plex_server_config:/config"
+      - "nas_media:/mnt/nas/shared/media"
+    working_dir: "/"
+    healthcheck:
+      test: "curl --connect-timeout 15 --max-time 100 --silent --show-error --fail 'http://localhost:32400/identity' >/dev/null"
+      interval: 1m
+      timeout: 15s
+      retries: 3
+      start_period: 1m
+
+  portainer_agent:
+    container_name: "portainer_agent"
+    image: portainer/agent:latest
+    restart: always
+    ports:
+      - 9001:9001
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.7
+
+  pi_hole:
+    container_name: pi_hole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8080:80/tcp"
+    environment:
+      TZ: '${TIMEZONE}'
+      WEBPASSWORD: '${PIHOLE_WEB_PASSWORD}'
+      FTLCONF_LOCAL_IPV4: '${HOST_IP_ADDRESS}'
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.90
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    volumes:
+      - 'pi_hole_data:/etc/pihole'
+      - 'pi_hole_dnsmasq:/etc/dnsmasq.d'
+    restart: unless-stopped
+
+  watchtower:
+    container_name: "watchtower"
+    image: nickfedor/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime
+      - $HOME/.docker/config.json:/config.json
+    environment:
+      - "WATCHTOWER_CLEANUP=true"
+      - "WATCHTOWER_SCHEDULE=0 0 4 * * *"
+      - "WATCHTOWER_DEBUG=true"
+    restart: unless-stopped
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.8
+
+  server_health_pinger:
+    container_name: server_health_pinger
+    image: sethsteenken/http-pinger:latest
+    restart: unless-stopped
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
+    environment:
+      - URL=${HEALTHCHECKSIO_URL}
+      - CRON_SCHEDULE=${HEALTHCHECKSIO_CRON_SCHEDULE}
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.9
+
+volumes:
+  plex_server_config:
+    name: plex_server_config
+  pi_hole_data:
+    name: pi_hole_data
+  pi_hole_dnsmasq:
+    name: pi_hole_dnsmasq
+  nas_backups_container_volumes:
+    name: nas_backups_container_volumes
+    driver: local
+    driver_opts:
+      type: "cifs"
+      o: "username=${NAS_BACKUPS_USER},password=${NAS_BACKUPS_PASSWORD},file_mode=0777,dir_mode=0777"
+      device: "//${NAS_IP_ADDRESS}/backups/container_volumes"
+  nas_media:
+    name: nas_media
+    driver: local
+    driver_opts:
+      type: "cifs"
+      o: "username=${NAS_USER},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
+      device: "//${NAS_IP_ADDRESS}/media"
+networks:
+  server_net:
+    name: server_net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+          gateway: 172.18.0.1
