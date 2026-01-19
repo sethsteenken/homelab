@@ -62,8 +62,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
     environment:
       - "WATCHTOWER_CLEANUP=true"
-      - "WATCHTOWER_SCHEDULE=${WATCHTOWER_SCHEDULE}"
-      - "WATCHTOWER_DEBUG=${WATCHTOWER_DEBUG}"
+      - "WATCHTOWER_SCHEDULE=0 15 4 * * *"
+      - "WATCHTOWER_DEBUG=true"
     restart: unless-stopped
     networks:
       server_net:
@@ -88,7 +88,7 @@ services:
     restart: unless-stopped
     environment:
       - URL=${HEALTHCHECKSIO_URL}
-      - CRON_SCHEDULE=${HEALTHCHECKSIO_CRON_SCHEDULE}
+      - CRON_SCHEDULE=*/30 * * * *
     networks:
       server_net:
         ipv4_address: 172.18.0.7
@@ -100,16 +100,16 @@ volumes:
     name: "nas_downloads_active"
     driver: local
     driver_opts:
-      type: "nfs"
-      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
-      device: ":/mnt/default_pool/downloads/_torrents/active"
+      type: "cifs"
+      o: "username=${NAS_USER},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
+      device: "//${NAS_IP_ADDRESS}/downloads/_torrents/active"
   nas_downloads_completed:
     name: "nas_downloads_completed"
     driver: local
     driver_opts:
-      type: "nfs"
-      o: "addr=${NAS_IP_ADDRESS},rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4"
-      device: ":/mnt/default_pool/downloads/_torrents/completed"
+      type: "cifs"
+      o: "username=${NAS_USER},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
+      device: "//${NAS_IP_ADDRESS}/downloads/_torrents/completed"
   deluge_config: 
     name: "deluge_config"
   jackett_config:

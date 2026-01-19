@@ -6,7 +6,7 @@ services:
       BACKUP_FILENAME: backup-secondary-%Y-%m-%dT%H-%M-%S.tar.gz
       BACKUP_PRUNING_PREFIX: backup-secondary-
       BACKUP_RETENTION_DAYS: 5
-      BACKUP_CRON_EXPRESSION: 0 3 * * *
+      BACKUP_CRON_EXPRESSION: 30 3 * * *
     networks:
       server_net:
         ipv4_address: 172.18.0.5
@@ -102,7 +102,7 @@ services:
       - $HOME/.docker/config.json:/config.json
     environment:
       - "WATCHTOWER_CLEANUP=true"
-      - "WATCHTOWER_SCHEDULE=0 0 4 * * *"
+      - "WATCHTOWER_SCHEDULE=0 30 4 * * *"
       - "WATCHTOWER_DEBUG=true"
     restart: unless-stopped
     dns:
