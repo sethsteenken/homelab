@@ -93,6 +93,32 @@ services:
       server_net:
         ipv4_address: 172.18.0.7
 
+  volumes_backup:
+    container_name: "volumes_backup"
+    image: offen/docker-volume-backup:latest
+    environment:
+      BACKUP_FILENAME: backup-private-%Y-%m-%dT%H-%M-%S.tar.gz
+      BACKUP_PRUNING_PREFIX: backup-private-
+      BACKUP_RETENTION_DAYS: 5
+      BACKUP_CRON_EXPRESSION: 15 3 * * *
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.8
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - nas_backups_container_volumes:/archive # /archive is where backups stored "locally", so drops into NAS
+      - deluge_config:/backup/deluge_config:ro
+      - jackett_config:/backup/jackett_config:ro
+    restart: unless-stopped
+    healthcheck:
+      test: "exit 0"
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
 volumes:
   auto_download_watch:
     name: "auto_download_watch"
@@ -110,7 +136,14 @@ volumes:
       type: "cifs"
       o: "username=${NAS_USER},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
       device: "//${NAS_IP_ADDRESS}/downloads/_torrents/completed"
-  deluge_config: 
+  nas_backups_container_volumes:
+    name: nas_backups_container_volumes
+    driver: local
+    driver_opts:
+      type: "cifs"
+      o: "username=${NAS_BACKUPS_USER},password=${NAS_BACKUPS_PASSWORD},file_mode=0777,dir_mode=0777"
+      device: "//${NAS_IP_ADDRESS}/backups/container_volumes"
+  deluge_config:
     name: "deluge_config"
   jackett_config:
     name: "jackett_config"
