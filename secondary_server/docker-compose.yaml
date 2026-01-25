@@ -129,6 +129,11 @@ services:
 volumes:
   plex_server_config:
     name: plex_server_config
+    driver: local
+    driver_opts:
+      type: none
+      device: /mnt/volumes/plex_server_config/_data
+      o: bind
   pi_hole_data:
     name: pi_hole_data
   pi_hole_dnsmasq:
