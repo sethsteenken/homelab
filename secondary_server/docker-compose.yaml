@@ -32,6 +32,8 @@ services:
     container_name: "plex"
     entrypoint:
       - "/init"
+    devices:
+      - "/dev/dri:/dev/dri"
     environment:
       - "PUID=1000"
       - "PGID=1000"
@@ -132,7 +134,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /mnt/volumes/plex_server_config/_data
+      device: /mnt/volumes/plex_server_config
       o: bind
   pi_hole_data:
     name: pi_hole_data
