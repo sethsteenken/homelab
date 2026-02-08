@@ -39,33 +39,42 @@ ls -l /etc/localtime
 
 ### Mount Local Disks
 
-To mount a new disk in Linux and configure it to mount automatically at boot, identify the device with , create a mount point (e.g., ), format it (e.g., ), and add a line to  using the UUID found via  to ensure persistent mounting. [1, 2, 3]  
-Steps to Mount a New Disk and Update fstab 
+1. Identify the new disk:
 
-1. Identify the new disk: 
-```bash
-lsblk
-```
-2. Partition the disk (if necessary): If the disk is new and has no partitions, use `fdisk`  or `parted` to create a partition (e.g., `/dev/sdb1` ). 
-3. Format the partition: Format the new partition with a filesystem, such as ext4. 
-```bash
-sudo mkfs.ext4 /dev/sdb1
-```
+    ```bash
+    lsblk
+    ```
+
+2. Partition the disk (if necessary): If the disk is new and has no partitions, use `fdisk`  or `parted` to create a partition (e.g., `sudo fdisk /dev/sdb` ).
+
+3. Format the partition: Format the new partition with a filesystem, such as ext4.
+
+    ```bash
+    sudo mkfs.ext4 /dev/sdb1
+    ```
+
 4. Create a mount point: Create a directory where the disk will be accessed.
-```bash
-sudo mkdir -p /mnt/volumes
-```
-5. Get the UUID of the partition: Use `blkid` to find the UUID, which is more reliable than device names. 
-```bash
-sudo blkid /dev/sdb1
-```
-6. Edit `/etc/fstab`: Open the file with a text editor. 
-```bash
-sudo nano /etc/fstab
-```
-7. Add the entry: Add the following line to the end of the file.
-```bash
-UUID=your-uuid /mnt/volumes ext4 defaults 0 2
-```
-8. Test the mount: Run `sudo mount -a` to test the configuration. If no errors are returned, the disk is properly configured.
 
+    ```bash
+    sudo mkdir -p /mnt/volumes
+    ```
+
+5. Get the UUID of the partition: Use `blkid` to find the UUID, which is more reliable than device names.
+
+    ```bash
+    sudo blkid /dev/sdb1
+    ```
+
+6. Edit `/etc/fstab`: Open the file with a text editor.
+
+    ```bash
+    sudo nano /etc/fstab
+    ```
+
+7. Add the entry: Add the following line to the end of the file.
+
+    ```bash
+    UUID=your-uuid /mnt/volumes ext4 defaults 0 2
+    ```
+
+8. Test the mount: Run `sudo mount -a` to test the configuration. If no errors are returned, the disk is properly configured.
