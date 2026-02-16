@@ -9,11 +9,13 @@ Follow [Instructions]](/proxmox_setup.md)
 ## Create VM
 
 * Leave Most Defaults (SeaBIOS, etc)
-* Add *Local_Storage* (no more than half of available space)
+* Add HDD storage if available
 * Use default vmbr0 bridge for networking
 * !Important - Select appropriate VLAN tag for VPN outbound network
 
 ## Linux Install
+
+Connect via Console in the web UI. If there are issues connecting, try restarting browser instance and/or ensure connecting directly to the Proxmox host IP address instead of a custom hostname.
 
 Follow [Instructions](/linux_setup.md)
 

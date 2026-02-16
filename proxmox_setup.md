@@ -11,9 +11,5 @@ Boot from thumb drive and follow install instructions.
 ## Setup
 
 * [Download Ubuntu Server 22+ ISO](https://ubuntu.com/download/server).
-* Setup *Local_Storage* storage TODO
+* Setup *Local_Storage* storage
 * Add ISO to Proxmox under Storage *local*
-
-## Troubleshooting
-
-TODO - failed to unbind /cdrom

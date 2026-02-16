@@ -2,7 +2,7 @@
 
 ## Install
 
-Mostly choose defaults. 
+Mostly choose defaults.
 
 * Install 3rd-party Software
 * For storage setup, be sure entire size the disk applied to the VM is set under the SIZE of the ubuntu-lv device mounted at /

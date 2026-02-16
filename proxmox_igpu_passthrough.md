@@ -175,11 +175,10 @@ docker run --rm --device /dev/dri:/dev/dri --group-add video ...
 
 ## Video Reference
 
-- YouTube: https://www.youtube.com/watch?v=UoL8YJAc-vE
+- YouTube: [https://www.youtube.com/watch?v=UoL8YJAc-vE](https://www.youtube.com/watch?v=UoL8YJAc-vE)
 
 ### Summary of the video description
 
 The referenced video demonstrates enabling Intel iGPU hardware acceleration with Proxmox, highlighting BIOS/UEFI settings, IOMMU configuration, and passing the iGPU to a guest for media transcoding. It covers the practical steps to attach the device in Proxmox and verify acceleration inside the guest (e.g., Plex/Jellyfin), along with common pitfalls and checks to confirm the GPU is correctly utilized.
 
 > Copyright notice: I haven't included the full video description verbatim to avoid reproducing copyrighted text. The summary above conveys the key points, and the direct link is provided for full context.
-

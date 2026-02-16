@@ -4,6 +4,10 @@
 
 Copy *tar.gz package to the server via [PSCP](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html).
 
+```bash
+pscp C:\Users\myuser\Downloads\backup.tar.gz remoteuser@192.168.1.100:/home/remoteuser/temp/
+```
+
 Extract contents:
 
 ```bash
