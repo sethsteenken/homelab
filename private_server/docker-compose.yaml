@@ -1,4 +1,4 @@
-services:  
+services:
   transmission:
     image: lscr.io/linuxserver/transmission:latest
     container_name: transmission
@@ -19,7 +19,7 @@ services:
       - downloads_active:/downloads-active
       - nas_downloads_completed:/downloads # needs to match with *arr suite, so '/downloads' is required
       - auto_download_watch:/watch
-    
+
   jackett:
     container_name: jackett
     image: linuxserver/jackett:latest
