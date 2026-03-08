@@ -392,7 +392,7 @@ services:
 
   services_monitor:
     container_name: services_monitor
-    image: louislam/uptime-kuma:1
+    image: louislam/uptime-kuma:2
     restart: unless-stopped
     dns:
       - 172.18.0.90
