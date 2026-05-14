@@ -431,6 +431,59 @@ services:
       server_net:
         ipv4_address: 172.18.0.16
 
+  home_assistant:
+    container_name: "home_assistant"
+    entrypoint:
+      - "/init"
+    image: "docker.io/homeassistant/home-assistant:latest"
+    labels:
+      docker-volume-backup.stop-during-backup: true
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.17
+    ports:
+      - "8123:8123/tcp"
+    privileged: true
+    restart: "unless-stopped"
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
+    security_opt:
+      - "label=disable"
+    volumes:
+      - "home_assistant_data:/config"
+    working_dir: "/config"
+    healthcheck:
+      test: "curl --connect-timeout 10 --silent -f http://localhost:8123/ || exit 1 "
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  govee2mqtt:
+    container_name: govee2mqtt
+    image: ghcr.io/wez/govee2mqtt:latest
+    restart: unless-stopped
+    networks:
+      server_net:
+        ipv4_address: 172.18.0.18
+    environment:
+      #- GOVEE_EMAIL=email
+      #- GOVEE_PASSWORD=password
+      - GOVEE_API_KEY=${GOVEE_API_KEY}
+      - GOVEE_MQTT_HOST=172.18.0.2
+      - GOVEE_MQTT_PORT=1883
+      - GOVEE_MQTT_USER=${GOVEE_MQTT_USER}
+      - GOVEE_MQTT_PASSWORD=${GOVEE_MQTT_PASSWORD}
+      - GOVEE_TEMPERATURE_SCALE=F
+      - RUST_LOG_STYLE=always
+      - TZ=${TIMEZONE}
+    volumes:
+      - 'govee2mqtt_data:/data'
+    dns:
+      - 172.18.0.90
+      - 1.1.1.1
+
 volumes:
   mqtt_broker_config:
     name: mqtt_broker_config
@@ -466,6 +519,10 @@ volumes:
     name: services_monitor_data
   qdirstat_config:
     name: qdirstat_config
+  home_assistant_data:
+    name: home_assistant_data
+  govee2mqtt_data:
+    name: govee2mqtt_data
   nas_backups:
     name: nas_backups
     driver: local
