@@ -99,6 +99,12 @@ Confirm installation
 upsc server-rack-ups
 ```
 
+## Install Clients
+
+[Install on a Proxmox VE](proxmox-client.md)
+
+[Install on a Virtual Machine](vm-client.md)
+
 ## Troubleshooting
 
 ```bash
