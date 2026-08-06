@@ -126,7 +126,7 @@ NOTIFYTYPE="ONBATT" UPSNAME="server-rack-ups@localhost" /usr/local/bin/nut-upssc
 Test the notify hook process for the UPS
 
 ```bash
-NOTIFYTYPE="ONBATT" UPSNAME="server-rack-ups@localhost" /usr/sbin/upssched
+sudo -u nut NOTIFYTYPE="ONBATT" UPSNAME="server-rack-ups@localhost" /usr/sbin/upssched
 ```
 
 ## Planned Schedule
