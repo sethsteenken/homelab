@@ -43,7 +43,7 @@ case $1 in
         send_to_discord "⚫ **UPS Alert:** No parent UPS detected!"
         ;;
     discord-replbatt)
-        send_to_discord "🗑️ **UPS Update:** Replacement battery installed."
+        send_to_discord "🗑️ **UPS Update:** Replace battery!"
         ;;
     discord-shutdown)
         send_to_discord "💀 **UPS Shutdown:** Full system shutdown initiated."

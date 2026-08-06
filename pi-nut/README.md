@@ -132,23 +132,26 @@ sudo -u nut NOTIFYTYPE="ONBATT" UPSNAME="server-rack-ups@localhost" /usr/sbin/up
 ## Planned Schedule
 
 On Battery - 1 min
+
 - Pi NUT - shuts down UNAS
 - Main Server VM shuts down
 - Private Server VM shuts down
 - Secondary Server VM shuts down
 
 On Battery - 3 mins
+
 - Main Server Proxmox (1) shuts down
 - Secondary Server Proxmox (2) shuts down
 
 Low Battery
+
 - Pi NUT - shuts down UDM PRO
 
 FSD
+
 - Pi NUT - kill switch for UPS
 - Pi NUT shuts down
 
 ## References
 
 [https://www.jeffgeerling.com/blog/2025/nut-on-my-pi-so-my-servers-dont-die/[(https://www.jeffgeerling.com/blog/2025/nut-on-my-pi-so-my-servers-dont-die/)]
-
