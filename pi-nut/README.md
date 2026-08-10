@@ -105,6 +105,38 @@ upsc server-rack-ups
 
 [Install on a Virtual Machine](vm-client.md)
 
+## Unifi Device Setup
+
+Use the client/monitor on the Pi-NUT to send SSH shutdown commands to Unifi devices that support it.
+
+Guide here: [
+Ubiquiti UniFi UNAS/UNVR Graceful Shutdown Using NUT ](https://www.youtube.com/watch?v=op4TjiT4zl8)
+
+### Allow Key-based SSH
+
+SSH into the Pi-NUT. Then use `ssh-keygen` and `ssh-copy-id` to the Unifi device.
+
+```bash
+ssh-keygen
+```
+
+Get the name of the public key (.pub) in `./ssh`.
+
+```bash
+ls .ssh -al
+```
+
+Then copy the public key to the Unifi device.
+
+```bash
+ssh-copy-id -i .ssh/id_xxxxx.pub root@192.168.x.x
+```
+
+The key does not need to be regenerated after the first machine. Simply copy the same public key to the next machine and so on.
+
+Guide here: [
+Ubiquiti UniFi Console/Switch - SSH Key based Authentication](https://www.youtube.com/watch?v=exbcFMMVZGo)
+
 ## Troubleshooting
 
 ```bash
@@ -118,6 +150,8 @@ sudo chmod +x /usr/local/bin/nut-upssched.sh
 sudo chown root:nut /usr/local/bin/nut-upssched.sh
 sudo chmod +x /usr/local/bin/shutdown-unas.sh
 sudo chown root:nut /usr/local/bin/shutdown-unas.sh
+sudo chmod +x /usr/local/bin/shutdown-udm.sh
+sudo chown root:nut /usr/local/bin/shutdown-udm.sh
 
 sudo chmod +x /run/nut/upssched/
 sudo chown root:nut /run/nut/upssched/
