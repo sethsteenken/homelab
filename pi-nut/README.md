@@ -117,19 +117,19 @@ Ubiquiti UniFi UNAS/UNVR Graceful Shutdown Using NUT ](https://www.youtube.com/w
 SSH into the Pi-NUT. Then use `ssh-keygen` and `ssh-copy-id` to the Unifi device.
 
 ```bash
-ssh-keygen
+sudo -u nut ssh-keygen
 ```
 
 Get the name of the public key (.pub) in `./ssh`.
 
 ```bash
-ls .ssh -al
+ls /var/lib/nut/.ssh -al
 ```
 
 Then copy the public key to the Unifi device.
 
 ```bash
-ssh-copy-id -i .ssh/id_xxxxx.pub root@192.168.x.x
+sudo -u nut ssh-copy-id -i /var/lib/nut/.ssh/id_xxxxx.pub root@192.168.x.x
 ```
 
 The key does not need to be regenerated after the first machine. Simply copy the same public key to the next machine and so on.
