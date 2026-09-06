@@ -1,0 +1,1 @@
+ssh root@UNAS_IP_ADDRESS 'shutdown -h +0'

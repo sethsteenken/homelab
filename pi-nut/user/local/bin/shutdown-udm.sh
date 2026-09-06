@@ -1,0 +1,1 @@
+ssh root@UDM_IP_ADDRESS 'shutdown -h +0'
